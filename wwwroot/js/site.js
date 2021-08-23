@@ -7,13 +7,12 @@
 
     $(document).ready(function () {
 
-        $("#content").html('<a id="riverroad" href="#" title="" >image of 1 Maple St.</a>');
-        $("#content #riverroad").tooltip({ content: '<img src=https://i2.wp.com/www.precolandia.com.br/blog/wp-content/uploads/2017/09/Como-fazer-o-melhor-queijo-quente.jpg?fit=1140%2C500&ssl=1" />' });
-
         $("#card2").hide();
         $("#card3").hide();
         $("#card4").hide();
 
+
+        CarregaCardapio();
 
         $("#AddLanche1").click(function () {
 
@@ -23,24 +22,43 @@
 
         $("#Lanche1").change(function () {
 
+            $("#Combo1").removeAttr("disabled", false);
+
             var lancheid = $("#Lanche1").val()
             var qtde = $("#Combo1").is(':checked');
             var combo = $("#Qtde1").val()
+            var ingrediente = $("#Ingrediente1").val()
 
-            var value = CalculaValor(lancheid, qtde, combo);
+            console.log($("#Ingrediente1"));
+
+            var value = CalculaValor(lancheid, qtde, combo, ingrediente);
             $("#QtdeItens").text("Qtd de Itens: " + combo);
 
             
         });
-
 
         $("#Combo1").change(function () {
 
             var lancheid = $("#Lanche1").val()
             var qtde = $("#Combo1").is(':checked');
             var combo = $("#Qtde1").val()
+            var ingrediente = $("#Ingrediente1").val()
 
-            var value = CalculaValor(lancheid, qtde, combo);
+            var value = CalculaValor(lancheid, qtde, combo, ingrediente);
+
+            $("#QtdeItens").text("Qtd de Itens: " + combo);
+
+
+        });
+
+        $("#Ingrediente1").change(function () {
+
+            var lancheid = $("#Lanche1").val()
+            var qtde = $("#Combo1").is(':checked');
+            var combo = $("#Qtde1").val()
+            var ingrediente = $("#Ingrediente1").val()
+
+            var value = CalculaValor(lancheid, qtde, combo, ingrediente);
 
             $("#QtdeItens").text("Qtd de Itens: " + combo);
 
@@ -52,8 +70,9 @@
             var lancheid = $("#Lanche1").val()
             var qtde = $("#Combo1").is(':checked');
             var combo = $("#Qtde1").val()
+            var ingrediente = $("#Ingrediente1").val()
 
-            var value = CalculaValor(lancheid, qtde, combo);
+            var value = CalculaValor(lancheid, qtde, combo, ingrediente);
 
             $("#QtdeItens").text("Qtd de Itens: " + combo);
 
@@ -95,19 +114,19 @@
 
     });
 
-function CalculaValor(lancheid, qtde, combo) {
+function CalculaValor(lancheid, qtde, combo, ingrediente) {
 
     $.ajax({
         type: "POST",
         url: "/Pedido/CalculaValorLanche",
-        data: { lancheid: lancheid, qtde: combo, combo: qtde },
+        data: { lancheid: lancheid, qtde: combo, combo: qtde, ingrediente: ingrediente },
         dataType: "json",
         success: function (result) {
             console.log(result);
             $("#ValorPedido").text("Valor: R$ " + result);
             return result;
 
-          
+
         },
         error: function (result) {
 
@@ -116,8 +135,24 @@ function CalculaValor(lancheid, qtde, combo) {
 
 
 
-
-
 }
 
+function CarregaCardapio() {
 
+    $.ajax({
+        type: "GET",
+        url: "/Home/CarregaCardapio",
+
+        dataType: "json",
+        success: function (dados) {
+            $(dados).each(function (i, item) {
+
+                console.log(dados);
+
+                $("#rowCardapio").append("<div class='col-md-3'> <div class='card' id='cardCardapio" + [i] + "'><div class='card-header'><span id='headerCardapio" + [i] + "'>" + dados[i].nome + " - R$: " + dados[i].valorBase + "</span> </div></div><div class='card-body' style='height: 12em;' id = 'bodyCardapio" + [i] + "'><img src=" + dados[i].imagemCaminho + " width='200' height='auto'/> </div><div class='card-footer'><a href='/Pedido/Create' id='fazerPedido'>Fazer Pedido : )</a ></div ></div ></div >");
+
+
+            });
+        }
+    });
+}

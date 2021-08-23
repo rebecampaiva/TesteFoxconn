@@ -51,8 +51,18 @@ namespace MRO.Controllers
                                                       select new
                                                       {
                                                           LancheId = s.LancheId,
-                                                          LancheNome = s.LancheId + " - " + s.Nome
+                                                          LancheNome = s.LancheId + " - " + s.Nome + " - R$ " + s.ValorBase
                                                       }), "LancheId", "LancheNome", null);
+
+
+            ViewData["Ingrediente"] = new SelectList((from s in _context.Ingredientes.OrderBy(m => m.Nome).ToList()
+                                                        select new
+                                                        {
+                                                            IngredienteId = s.IngredienteId,
+                                                            IngredienteValor = s.Valor.ToString(),
+                                                            IngredienteNome = s.IngredienteId + " - " + s.Nome + " - R$ " + s.Valor
+                                                        }), "IngredienteValor", "IngredienteNome", null);
+
 
             var ultimoReg = _context.Pedidos.Take(1).Single();
 
@@ -86,21 +96,30 @@ namespace MRO.Controllers
         }
 
         [HttpPost]
-        public double CalculaValorLanche(int lancheid, int qtde, bool combo)
+        public double CalculaValorLanche(int lancheid, int qtde, bool combo, string ingrediente)
         {
             double valorcombo = 0;
+            double ingredienteConv = 0;
+
+            if (ingrediente != null)
+            {
+                 ingredienteConv = Convert.ToDouble(ingrediente.Replace(',', '.'));
+            }
+            else
+            { ingredienteConv = 0;  }
+
             double valor = Convert.ToDouble(_context.Lanches.Single(r => r.LancheId == lancheid).ValorBase);
             if (qtde == 1)
             {
                 if (combo == true)
                 {
-                    valorcombo = 5.90 + (valor * qtde);
+                    valorcombo = 5.90 + (valor * qtde) + ingredienteConv;
                     valor = valorcombo;
                 }
 
                 else
                 {
-                    valorcombo = valor * qtde;
+                    valorcombo = (valor * qtde) + ingredienteConv;
                     valor = valorcombo;
                 }
             }
@@ -109,7 +128,7 @@ namespace MRO.Controllers
 
                 if (combo == true)
                 {
-                    valorcombo = 5.90 + (valor * qtde);
+                    valorcombo = 5.90 + (valor * qtde) + ingredienteConv;
                     valor = valorcombo;
                 }
 
@@ -129,13 +148,13 @@ namespace MRO.Controllers
 
                 if (combo == true)
                 {
-                    valorcombo = 5.90 + (valor * qtde);
+                    valorcombo = 5.90 + (valor * qtde) + ingredienteConv;
                     valor = valorcombo;
                 }
 
                 else
                 {
-                    valorcombo = valor * qtde;
+                    valorcombo = (valor * qtde) + ingredienteConv;
                     valor = valorcombo;
                 }
 
@@ -149,13 +168,13 @@ namespace MRO.Controllers
 
                 if (combo == true)
                 {
-                    valorcombo = 5.90 + (valor * qtde);
+                    valorcombo = 5.90 + (valor * qtde) + ingredienteConv;
                     valor = valorcombo;
                 }
 
                 else
                 {
-                    valorcombo = valor * qtde;
+                    valorcombo = (valor * qtde) + ingredienteConv;
                     valor = valorcombo;
                 }
 

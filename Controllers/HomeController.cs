@@ -33,5 +33,17 @@ namespace MRO.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        [HttpGet]
+        [Produces("application/json")]
+        public JsonResult CarregaCardapio()
+        {
+            Data.DB_TesteContext context = new Data.DB_TesteContext();
+
+            List<Lanche> result = context.Lanches.Where(s => s.Ativo == true).ToList();
+
+            return Json(result);
+           
+        }
     }
 }
